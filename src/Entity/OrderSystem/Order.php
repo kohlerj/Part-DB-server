@@ -33,9 +33,12 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\ApiPlatform\Filter\LikeFilter;
-use App\Entity\Base\AbstractDBElement;
+use App\Entity\Attachments\Attachment;
+use App\Entity\Attachments\OrderAttachment;
+use App\Entity\Base\AbstractStructuralDBElement;
 use App\Entity\Base\TimestampTrait;
 use App\Entity\Contracts\TimeStampableInterface;
+use App\Entity\Parameters\OrderParameter;
 use App\Repository\OrderSystem\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -46,6 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Represents a purchase order — a saved list of parts to order from suppliers.
+ * @extends AbstractStructuralDBElement<OrderAttachment, OrderParameter>
  */
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -64,15 +68,31 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(PropertyFilter::class)]
 #[ApiFilter(LikeFilter::class, properties: ['name', 'notes'])]
 #[ApiFilter(OrderFilter::class, properties: ['name', 'id', 'addedDate', 'lastModified'])]
-class Order extends AbstractDBElement implements TimeStampableInterface
+class Order extends AbstractStructuralDBElement implements TimeStampableInterface
 {
     use TimestampTrait;
 
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 255)]
-    #[Groups(['order:read', 'order:write'])]
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    protected string $name = '';
+    // parent/children for tree structure
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    protected Collection $children;
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id')]
+    protected ?AbstractStructuralDBElement $parent = null;
+
+    // attachments
+    #[ORM\OneToMany(mappedBy: 'element', targetEntity: OrderAttachment::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    protected Collection $attachments;
+
+    #[ORM\ManyToOne(targetEntity: OrderAttachment::class)]
+    #[ORM\JoinColumn(name: 'id_preview_attachment', onDelete: 'SET NULL')]
+    protected ?Attachment $master_picture_attachment = null;
+
+    // parameters
+    #[ORM\OneToMany(mappedBy: 'element', targetEntity: OrderParameter::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    protected Collection $parameters;
 
     #[Groups(['order:read', 'order:write'])]
     #[ORM\Column(type: Types::TEXT)]
@@ -97,19 +117,10 @@ class Order extends AbstractDBElement implements TimeStampableInterface
 
     public function __construct()
     {
+        parent::__construct();
+        $this->children = new ArrayCollection();
         $this->items = new ArrayCollection();
         $this->supplierReferences = new ArrayCollection();
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-        return $this;
     }
 
     public function getNotes(): string

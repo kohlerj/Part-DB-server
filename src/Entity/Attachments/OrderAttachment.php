@@ -21,14 +21,29 @@ declare(strict_types=1);
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace App\Repository\OrderSystem;
+namespace App\Entity\Attachments;
 
 use App\Entity\OrderSystem\Order;
-use App\Repository\StructuralDBElementRepository;
+use App\Serializer\APIPlatform\OverrideClassDenormalizer;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Context;
 
 /**
- * @extends StructuralDBElementRepository<Order>
+ * An attachment attached to an order.
+ * @extends Attachment<Order>
  */
-class OrderRepository extends StructuralDBElementRepository
+#[UniqueEntity(['name', 'attachment_type', 'element'])]
+#[ORM\Entity]
+class OrderAttachment extends Attachment
 {
+    final public const ALLOWED_ELEMENT_CLASS = Order::class;
+
+    /**
+     * @var Order|null the element this attachment is associated with
+     */
+    #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'attachments')]
+    #[ORM\JoinColumn(name: 'element_id', nullable: false, onDelete: 'CASCADE')]
+    #[Context(denormalizationContext: [OverrideClassDenormalizer::CONTEXT_KEY => self::ALLOWED_ELEMENT_CLASS])]
+    protected ?AttachmentContainingDBElement $element = null;
 }
