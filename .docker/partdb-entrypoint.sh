@@ -61,6 +61,11 @@ if [ -n "$COMPOSER_EXTRA_PACKAGES" ]; then
     fi
 fi
 
+# In debug mode, let opcache detect file changes from bind-mounted sources
+if [ "$APP_DEBUG" = "1" ]; then
+    echo "opcache.validate_timestamp=1" > /etc/php/PHP_VERSION/fpm/conf.d/99-dev.ini
+fi
+
 # Start PHP-FPM (the PHP_VERSION is replaced by the configured version in the Dockerfile)
 php-fpmPHP_VERSION -F &
 

@@ -1,4 +1,5 @@
 {% extends "main_card.html.twig" %}
+{% import 'components/collection_type.macro.html.twig' as collection %}
 
 {% block title %}{% trans %}order.show.title{% endtrans %}: {{ order.name }}{% endblock %}
 
@@ -45,21 +46,25 @@
 
     {# Supplier references #}
     <h5><i class="fa-solid fa-hashtag fa-fw"></i> {% trans %}order.supplier_references{% endtrans %}</h5>
-    <div id="supplier-references-container" data-controller="elements/collection"
-         data-elements--collection-add-label-value="{% trans %}order.supplier_reference.add{% endtrans %}">
-        {% for refForm in form.supplierReferences %}
-            <div class="row g-2 align-items-center mb-2 collection-item">
-                <div class="col-md-4">{{ form_row(refForm.supplier) }}</div>
-                <div class="col-md-6">{{ form_row(refForm.orderNumber) }}</div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-sm btn-outline-danger collection-remove">
-                        <i class="fa-solid fa-times fa-fw"></i>
-                    </button>
+    <div {{ collection.controller(form.supplierReferences) }}>
+        <div {{ collection.target() }}>
+            {% for refForm in form.supplierReferences %}
+                <div class="row g-2 align-items-center mb-2 collection-item">
+                    <div class="col-md-4">{{ form_row(refForm.supplier) }}</div>
+                    <div class="col-md-6">{{ form_row(refForm.orderNumber) }}</div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger" {{ collection.delete_btn() }}>
+                            <i class="fa-solid fa-times fa-fw"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary mb-2" {{ collection.create_btn() }}>
+            <i class="fa-solid fa-plus fa-fw"></i>
+            {% trans %}order.supplier_reference.add{% endtrans %}
+        </button>
     </div>
-    {{ form_widget(form.supplierReferences) }}
 
     <hr>
 
@@ -68,53 +73,54 @@
         <span class="badge bg-secondary">{{ order.items | length }}</span>
     </h5>
 
-    <div class="table-responsive">
-        <table class="table table-sm table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>{% trans %}order.item.name{% endtrans %}</th>
-                    <th>{% trans %}order.item.quantity{% endtrans %}</th>
-                    <th>{% trans %}order.item.supplier{% endtrans %}</th>
-                    <th>{% trans %}order.item.supplier_part_nr{% endtrans %}</th>
-                    {% if is_granted('edit', order) %}<th></th>{% endif %}
-                </tr>
-            </thead>
-            <tbody id="order-items-container">
-                {% for itemForm in form.items %}
-                    <tr class="collection-item">
-                        <td>
-                            {% if itemForm.vars.data.part is not null %}
-                                <a href="{{ entity_url(itemForm.vars.data.part, 'info') }}" target="_blank">
-                                    {{ form_widget(itemForm.name) }}
-                                </a>
-                            {% else %}
-                                {{ form_widget(itemForm.name) }}
-                            {% endif %}
-                            {{ form_widget(itemForm.part, {'attr': {'class': 'd-none'}}) }}
-                        </td>
-                        <td>{{ form_widget(itemForm.quantity, {'attr': {'style': 'width:100px'}}) }}</td>
-                        <td>{{ form_widget(itemForm.supplier) }}</td>
-                        <td>{{ form_widget(itemForm.supplierPartNr) }}</td>
-                        {% if is_granted('edit', order) %}
-                            <td>
-                                <button type="button" class="btn btn-sm btn-outline-danger collection-remove">
-                                    <i class="fa-solid fa-times fa-fw"></i>
-                                </button>
-                            </td>
-                        {% endif %}
+    <div {{ collection.controller(form.items) }}>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle" {{ collection.target() }}>
+                <thead class="table-light">
+                    <tr>
+                        <th>{% trans %}order.item.name{% endtrans %}</th>
+                        <th>{% trans %}order.item.quantity{% endtrans %}</th>
+                        <th>{% trans %}order.item.supplier{% endtrans %}</th>
+                        <th>{% trans %}order.item.supplier_part_nr{% endtrans %}</th>
+                        {% if is_granted('edit', order) %}<th></th>{% endif %}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    {% for itemForm in form.items %}
+                        <tr class="collection-item">
+                            <td>
+                                {% if itemForm.vars.data.part is not null %}
+                                    <a href="{{ entity_url(itemForm.vars.data.part, 'info') }}" target="_blank">
+                                        {{ form_widget(itemForm.name) }}
+                                    </a>
+                                {% else %}
+                                    {{ form_widget(itemForm.name) }}
+                                {% endif %}
+                                {{ form_widget(itemForm.part, {'attr': {'class': 'd-none'}}) }}
+                            </td>
+                            <td>{{ form_widget(itemForm.quantity, {'attr': {'style': 'width:100px'}}) }}</td>
+                            <td>{{ form_widget(itemForm.supplier) }}</td>
+                            <td>{{ form_widget(itemForm.supplierPartNr) }}</td>
+                            {% if is_granted('edit', order) %}
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" {{ collection.delete_btn() }}>
+                                        <i class="fa-solid fa-times fa-fw"></i>
+                                    </button>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    {% if is_granted('edit', order) %}
-        {{ form_widget(form.items) }}
-        <button type="button" class="btn btn-sm btn-outline-secondary mb-3 collection-add" data-collection-target="order-items-container">
-            <i class="fa-solid fa-plus fa-fw"></i>
-            {% trans %}order.item.add{% endtrans %}
-        </button>
-    {% endif %}
+        {% if is_granted('edit', order) %}
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" {{ collection.create_btn() }}>
+                <i class="fa-solid fa-plus fa-fw"></i>
+                {% trans %}order.item.add{% endtrans %}
+            </button>
+        {% endif %}
+    </div>
 
     {% if is_granted('edit', order) %}
         <div class="mt-3">

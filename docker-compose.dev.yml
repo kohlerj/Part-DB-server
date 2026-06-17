@@ -1,53 +1,27 @@
 services:
-  app:
+  partdb:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:80"
     volumes:
-      # Mount the entire source tree so edits on the host reflect immediately
-      - .:/var/www/html
-      # Named volumes take precedence over the bind mount above for directories
-      # built into the image — vendor and assets are preserved from the image build.
-      - vendor:/var/www/html/vendor
-      - build_assets:/var/www/html/public/build
       # Persist user uploads and media locally
       - ./docker-data/uploads:/var/www/html/uploads
       - ./docker-data/media:/var/www/html/public/media
+      - ./docker-data/db:/var/www/html/var/db
+      # Mount source directories — changes are reflected without rebuilding
+      - ./src:/var/www/html/src
+      - ./templates:/var/www/html/templates
+      - ./config:/var/www/html/config
+      - ./translations:/var/www/html/translations
     environment:
-      APP_ENV: dev
+      DATABASE_URL: sqlite:///%kernel.project_dir%/uploads/app.db
+      APP_ENV: docker
+      APP_DEBUG: "1"
       APP_SECRET: 318b5d659e07a0b3f96d9b3a83b254ca
-      # PostgreSQL connection — matches the `db` service below
-      DATABASE_URL: "postgresql://partdb:partdb@db:5432/partdb?serverVersion=16&charset=utf8"
       # Automatically run migrations on startup
       DB_AUTOMIGRATE: "true"
       DEFAULT_URI: "http://localhost:8080/"
       MAILER_DSN: "null://null"
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
 
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: partdb
-      POSTGRES_USER: partdb
-      POSTGRES_PASSWORD: partdb
-    volumes:
-      # Persist database data in a local folder (git-ignored)
-      - ./docker-data/postgres:/var/lib/postgresql/data
-    ports:
-      # Expose port so you can connect with a local DB client (e.g. pgAdmin)
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U partdb -d partdb"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    restart: unless-stopped
-
-volumes:
-  vendor:
-  build_assets:

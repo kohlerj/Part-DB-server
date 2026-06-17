@@ -14,30 +14,36 @@
 
     {# Project rows #}
     <h5>{% trans %}order.ordering_helper.projects{% endtrans %}</h5>
-    <div id="project-rows-container">
-        {% for entryForm in form.projects %}
-            <div class="row g-2 align-items-end mb-2 collection-item">
-                <div class="col-md-8">
-                    {{ form_row(entryForm.project) }}
+    <div {{ stimulus_controller('pages/synonyms_collection', {
+        prototype: form_widget(form.projects.vars.prototype)|e('html_attr'),
+        prototypeName: '__name__',
+        index: form.projects|length
+    }) }}>
+        <div {{ stimulus_target('pages/synonyms_collection', 'items') }}>
+            {% for entryForm in form.projects %}
+                <div class="row g-2 align-items-end mb-2 tc-item">
+                    <div class="col-md-6">
+                        {{ form_row(entryForm.project) }}
+                    </div>
+                    <div class="col-md-5">
+                        {{ form_row(entryForm.build_count, {'label_attr': {'class': 'text-nowrap'}}) }}
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-sm btn-outline-danger mb-3"
+                                {{ stimulus_action('pages/synonyms_collection', 'remove') }}>
+                            <i class="fa-solid fa-times fa-fw"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    {{ form_row(entryForm.build_count) }}
-                </div>
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-sm btn-outline-danger mb-3 collection-remove">
-                        <i class="fa-solid fa-times fa-fw"></i>
-                    </button>
-                </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-sm btn-outline-secondary mb-3"
+                {{ stimulus_action('pages/synonyms_collection', 'add') }}>
+            <i class="fa-solid fa-plus fa-fw"></i>
+            {% trans %}order.ordering_helper.add_project{% endtrans %}
+        </button>
     </div>
-
-    {{ form_widget(form.projects) }}
-
-    <button type="button" class="btn btn-sm btn-outline-secondary mb-3 collection-add" data-collection-target="project-rows-container">
-        <i class="fa-solid fa-plus fa-fw"></i>
-        {% trans %}order.ordering_helper.add_project{% endtrans %}
-    </button>
 
     <hr>
 
