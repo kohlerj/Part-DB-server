@@ -66,19 +66,24 @@ final class OrderingHelperService
                 }
 
                 $needed = $bomEntry->getQuantity() * $buildCount;
-                $inStock = max(0.0, $part->getAmountSum());
-                $toOrder = max(0.0, $needed - $inStock);
-
-                if ($toOrder <= 0) {
-                    continue;
-                }
 
                 $partId = $part->getID();
                 if (!isset($neededByPartId[$partId])) {
                     $neededByPartId[$partId] = 0.0;
                     $partsById[$partId] = $part;
                 }
-                $neededByPartId[$partId] += $toOrder;
+                $neededByPartId[$partId] += $needed;
+            }
+        }
+
+        // Subtract stock once per part after summing all requirements
+        foreach ($neededByPartId as $partId => $needed) {
+            $inStock = max(0.0, $partsById[$partId]->getAmountSum());
+            $toOrder = max(0.0, $needed - $inStock);
+            if ($toOrder <= 0) {
+                unset($neededByPartId[$partId], $partsById[$partId]);
+            } else {
+                $neededByPartId[$partId] = $toOrder;
             }
         }
 
