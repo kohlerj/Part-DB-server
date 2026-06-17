@@ -14,8 +14,24 @@
 
     {# Project rows #}
     <h5>{% trans %}order.ordering_helper.projects{% endtrans %}</h5>
+    {% set project_prototype %}
+        <div class="row g-2 align-items-end mb-2 tc-item">
+            <div class="col-md-6">
+                {{ form_row(form.projects.vars.prototype.project) }}
+            </div>
+            <div class="col-md-5">
+                {{ form_row(form.projects.vars.prototype.build_count, {'label_attr': {'class': 'text-nowrap'}}) }}
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-sm btn-outline-danger mb-3"
+                        {{ stimulus_action('pages/synonyms_collection', 'remove') }}>
+                    <i class="fa-solid fa-times fa-fw"></i>
+                </button>
+            </div>
+        </div>
+    {% endset %}
     <div {{ stimulus_controller('pages/synonyms_collection', {
-        prototype: form_widget(form.projects.vars.prototype)|e('html_attr'),
+        prototype: project_prototype|e('html_attr'),
         prototypeName: '__name__',
         index: form.projects|length
     }) }}>

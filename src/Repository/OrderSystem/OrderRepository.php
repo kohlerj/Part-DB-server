@@ -31,4 +31,15 @@ use App\Repository\StructuralDBElementRepository;
  */
 class OrderRepository extends StructuralDBElementRepository
 {
+    /**
+     * Returns all orders sorted by most recently modified.
+     * @return Order[]
+     */
+    public function findAllSortedByDate(): array
+    {
+        return $this->createQueryBuilder('o')
+            ->orderBy('o.lastModified', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -26,7 +26,7 @@ namespace App\Form\OrderSystem;
 use App\Entity\OrderSystem\OrderItem;
 use App\Entity\Parts\Supplier;
 use App\Form\Type\PartSelectType;
-use App\Form\Type\StructuralEntityType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -51,15 +51,18 @@ class OrderItemType extends AbstractType
                 'html5' => true,
                 'attr' => ['min' => 0, 'step' => 'any'],
             ])
-            ->add('supplier', StructuralEntityType::class, [
+            ->add('supplier', EntityType::class, [
                 'class' => Supplier::class,
+                'choice_label' => 'name',
                 'required' => false,
-                'disable_not_selectable' => true,
+                'placeholder' => '',
                 'label' => 'order.item.supplier',
+                'attr' => ['class' => 'js-order-item-supplier'],
             ])
             ->add('supplierPartNr', TextType::class, [
                 'required' => false,
                 'label' => 'order.item.supplier_part_nr',
+                'attr' => ['class' => 'js-order-item-sku'],
             ]);
     }
 

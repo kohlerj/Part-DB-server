@@ -25,7 +25,9 @@ namespace App\Controller;
 
 use App\Entity\OrderSystem\Order;
 use App\Entity\OrderSystem\OrderItem;
+use App\Entity\Parts\Part;
 use App\Entity\Parts\PartLot;
+use App\Entity\Parts\Supplier;
 use App\Form\OrderSystem\OrderType;
 use App\Form\OrderSystem\OrderingHelperType;
 use App\Form\OrderSystem\ReceiveOrderType;
@@ -34,6 +36,7 @@ use App\Services\OrderSystem\OrderingHelperService;
 use App\Services\Parts\PartLotWithdrawAddHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -61,6 +64,41 @@ class OrderController extends AbstractController
         return $this->render('orders/list.html.twig', [
             'orders' => $orders,
         ]);
+    }
+
+    /**
+     * Returns the order details (supplier + SKU pairs) for a given part as JSON.
+     * Used to dynamically populate the supplier and SKU fields of an order item.
+     */
+    #[Route(path: '/part-orderdetails', name: 'order_part_orderdetails', methods: ['GET'])]
+    public function partOrderdetails(Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('@orders.read');
+
+        $partId = $request->query->getInt('part');
+        if ($partId <= 0) {
+            return new JsonResponse([]);
+        }
+
+        $part = $this->entityManager->find(Part::class, $partId);
+        if (!$part instanceof Part) {
+            return new JsonResponse([]);
+        }
+
+        $result = [];
+        foreach ($part->getOrderdetails() as $orderdetail) {
+            $supplier = $orderdetail->getSupplier();
+            if (!$supplier instanceof Supplier) {
+                continue;
+            }
+            $result[] = [
+                'supplier_id' => $supplier->getID(),
+                'supplier_name' => $supplier->getName(),
+                'sku' => $orderdetail->getSupplierPartNr(),
+            ];
+        }
+
+        return new JsonResponse($result);
     }
 
     #[Route(path: '/new', name: 'order_new')]

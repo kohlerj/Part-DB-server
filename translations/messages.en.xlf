@@ -13680,6 +13680,18 @@ Buerklin-API Authentication server:
         <target>Orders</target>
       </segment>
     </unit>
+    <unit id="ord.002a" name="order_item.label">
+      <segment state="translated">
+        <source>order_item.label</source>
+        <target>Order item</target>
+      </segment>
+    </unit>
+    <unit id="ord.002b" name="order_item.labelp">
+      <segment state="translated">
+        <source>order_item.labelp</source>
+        <target>Order items</target>
+      </segment>
+    </unit>
     <unit id="ord.003" name="order.name">
       <segment state="translated">
         <source>order.name</source>
@@ -13768,6 +13780,12 @@ Buerklin-API Authentication server:
       <segment state="translated">
         <source>order.item.part</source>
         <target>Part</target>
+      </segment>
+    </unit>
+    <unit id="ord.017b" name="order.item.open_part">
+      <segment state="translated">
+        <source>order.item.open_part</source>
+        <target>Open part in new tab</target>
       </segment>
     </unit>
     <unit id="ord.018" name="order.item.add">

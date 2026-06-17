@@ -26,6 +26,7 @@ use App\Entity\Attachments\Attachment;
 use App\Entity\Attachments\AttachmentType;
 use App\Entity\Attachments\PartAttachment;
 use App\Entity\Base\AbstractDBElement;
+use App\Entity\OrderSystem\Order;
 use App\Entity\Parameters\PartParameter;
 use App\Entity\Parts\PartCustomState;
 use App\Entity\ProjectSystem\Project;
@@ -201,6 +202,7 @@ class EntityURLGenerator
     {
         $map = [
             Part::class => 'part_info',
+            Order::class => 'order_show',
 
             //As long we does not have own things for it use edit page
             AttachmentType::class => 'attachment_type_edit',
