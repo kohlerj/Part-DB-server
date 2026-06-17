@@ -31,7 +31,6 @@ use App\Entity\Parts\Supplier;
 use App\Form\OrderSystem\OrderType;
 use App\Form\OrderSystem\OrderingHelperType;
 use App\Form\OrderSystem\ReceiveOrderType;
-use App\Repository\OrderSystem\OrderRepository;
 use App\Services\OrderSystem\OrderingHelperService;
 use App\Services\Parts\PartLotWithdrawAddHelper;
 use Doctrine\ORM\EntityManagerInterface;
@@ -57,7 +56,6 @@ class OrderController extends AbstractController
     {
         $this->denyAccessUnlessGranted('@orders.read');
 
-        /** @var OrderRepository $repo */
         $repo = $this->entityManager->getRepository(Order::class);
         $orders = $repo->findAllSortedByDate();
 
@@ -320,7 +318,7 @@ class OrderController extends AbstractController
             $previewRequests = $requests;
 
             // If "Save as Order" button was clicked
-            if ($form->get('save_order')->isClicked() && !empty($previewItems)) {
+            if ($form->get('save_order')->isClicked() && !empty($previewItems)) { //@phpstan-ignore-line Phpstan does not recognize the isClicked method
                 $this->denyAccessUnlessGranted('@orders.create');
                 $orderName = ($data['order_name'] !== '' && $data['order_name'] !== null)
                     ? $data['order_name']

@@ -119,6 +119,8 @@ class Order extends AbstractStructuralDBElement implements TimeStampableInterfac
     {
         parent::__construct();
         $this->children = new ArrayCollection();
+        $this->attachments = new ArrayCollection();
+        $this->parameters = new ArrayCollection();
         $this->items = new ArrayCollection();
         $this->supplierReferences = new ArrayCollection();
     }
