@@ -284,6 +284,8 @@
             function onPartChange(row) {
                 const partId = partIdOf(row);
                 if (!partId) {
+                    populateSuppliers(row, [], false);
+                    updateSku(row);
                     return;
                 }
                 fetchOrderdetails(partId).then(ods => {

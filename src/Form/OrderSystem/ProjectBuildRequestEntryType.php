@@ -47,7 +47,7 @@ class ProjectBuildRequestEntryType extends AbstractType
                 'class' => Project::class,
                 'disable_not_selectable' => false,
                 'label' => 'project.label',
-                'constraints' => [new NotBlank()],
+                'required' => false,
             ])
             ->add('build_count', IntegerType::class, [
                 'label' => 'order.ordering_helper.build_count',

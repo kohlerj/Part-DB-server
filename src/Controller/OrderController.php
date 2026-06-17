@@ -86,7 +86,7 @@ class OrderController extends AbstractController
         }
 
         $result = [];
-        foreach ($part->getOrderdetails() as $orderdetail) {
+        foreach ($part->getOrderdetails(true) as $orderdetail) {
             $supplier = $orderdetail->getSupplier();
             if (!$supplier instanceof Supplier) {
                 continue;
