@@ -16,11 +16,11 @@ final class Version20260617100000 extends AbstractMultiPlatformMigration
 
     public function mySQLUp(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE orders ADD parent_id INT DEFAULT NULL, ADD comment LONGTEXT NOT NULL DEFAULT \'\', ADD not_selectable TINYINT(1) NOT NULL DEFAULT 0, ADD alternative_names LONGTEXT DEFAULT NULL, ADD id_preview_attachment INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE orders ADD parent_id INT DEFAULT NULL, ADD comment LONGTEXT NOT NULL, ADD not_selectable TINYINT(1) NOT NULL, ADD alternative_names LONGTEXT DEFAULT NULL, ADD id_preview_attachment INT DEFAULT NULL');
         $this->addSql('ALTER TABLE orders ADD CONSTRAINT FK_E52FFDEE727ACA70 FOREIGN KEY (parent_id) REFERENCES orders (id)');
         $this->addSql('ALTER TABLE orders ADD CONSTRAINT FK_E52FFDEEA8A86FA3 FOREIGN KEY (id_preview_attachment) REFERENCES attachments (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX IDX_E52FFDEE727ACA70 ON orders (parent_id)');
-        $this->addSql('CREATE INDEX IDX_E52FFDEEA8A86FA3 ON orders (id_preview_attachment)');
+        $this->addSql('CREATE INDEX IDX_E52FFDEEEA7100A1 ON orders (id_preview_attachment)');
     }
 
     public function mySQLDown(Schema $schema): void
@@ -28,7 +28,7 @@ final class Version20260617100000 extends AbstractMultiPlatformMigration
         $this->addSql('ALTER TABLE orders DROP FOREIGN KEY FK_E52FFDEE727ACA70');
         $this->addSql('ALTER TABLE orders DROP FOREIGN KEY FK_E52FFDEEA8A86FA3');
         $this->addSql('DROP INDEX IDX_E52FFDEE727ACA70 ON orders');
-        $this->addSql('DROP INDEX IDX_E52FFDEEA8A86FA3 ON orders');
+        $this->addSql('DROP INDEX IDX_E52FFDEEEA7100A1 ON orders');
         $this->addSql('ALTER TABLE orders DROP parent_id, DROP comment, DROP not_selectable, DROP alternative_names, DROP id_preview_attachment');
     }
 
@@ -55,14 +55,14 @@ final class Version20260617100000 extends AbstractMultiPlatformMigration
     public function postgreSQLUp(Schema $schema): void
     {
         $this->addSql('ALTER TABLE orders ADD parent_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE orders ADD comment TEXT NOT NULL DEFAULT \'\'');
-        $this->addSql('ALTER TABLE orders ADD not_selectable BOOLEAN NOT NULL DEFAULT false');
+        $this->addSql('ALTER TABLE orders ADD comment TEXT NOT NULL');
+        $this->addSql('ALTER TABLE orders ADD not_selectable BOOLEAN NOT NULL');
         $this->addSql('ALTER TABLE orders ADD alternative_names TEXT DEFAULT NULL');
         $this->addSql('ALTER TABLE orders ADD id_preview_attachment INT DEFAULT NULL');
         $this->addSql('ALTER TABLE orders ADD CONSTRAINT FK_E52FFDEE727ACA70 FOREIGN KEY (parent_id) REFERENCES orders (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE orders ADD CONSTRAINT FK_E52FFDEEA8A86FA3 FOREIGN KEY (id_preview_attachment) REFERENCES attachments (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('CREATE INDEX IDX_E52FFDEE727ACA70 ON orders (parent_id)');
-        $this->addSql('CREATE INDEX IDX_E52FFDEEA8A86FA3 ON orders (id_preview_attachment)');
+        $this->addSql('CREATE INDEX IDX_E52FFDEEEA7100A1 ON orders (id_preview_attachment)');
     }
 
     public function postgreSQLDown(Schema $schema): void
@@ -70,7 +70,7 @@ final class Version20260617100000 extends AbstractMultiPlatformMigration
         $this->addSql('ALTER TABLE orders DROP CONSTRAINT FK_E52FFDEE727ACA70');
         $this->addSql('ALTER TABLE orders DROP CONSTRAINT FK_E52FFDEEA8A86FA3');
         $this->addSql('DROP INDEX IDX_E52FFDEE727ACA70');
-        $this->addSql('DROP INDEX IDX_E52FFDEEA8A86FA3');
+        $this->addSql('DROP INDEX IDX_E52FFDEEEA7100A1');
         $this->addSql('ALTER TABLE orders DROP parent_id');
         $this->addSql('ALTER TABLE orders DROP comment');
         $this->addSql('ALTER TABLE orders DROP not_selectable');

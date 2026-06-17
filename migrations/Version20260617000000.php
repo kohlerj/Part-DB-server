@@ -16,9 +16,9 @@ final class Version20260617000000 extends AbstractMultiPlatformMigration
 
     public function mySQLUp(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE orders (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, notes LONGTEXT NOT NULL, last_modified DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', datetime_added DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE order_items (id INT AUTO_INCREMENT NOT NULL, order_id INT NOT NULL, part_id INT DEFAULT NULL, supplier_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, quantity DOUBLE PRECISION NOT NULL, supplier_part_nr VARCHAR(255) DEFAULT NULL, last_modified DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', datetime_added DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_62809DB08D9F6D38 (order_id), INDEX IDX_62809DB04CE34BEC (part_id), INDEX IDX_62809DB02ADD6D8C (supplier_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE order_supplier_references (id INT AUTO_INCREMENT NOT NULL, order_id INT NOT NULL, supplier_id INT DEFAULT NULL, order_number VARCHAR(255) NOT NULL, last_modified DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', datetime_added DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_F2E8BB278D9F6D38 (order_id), INDEX IDX_F2E8BB272ADD6D8C (supplier_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE orders (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, notes LONGTEXT NOT NULL, last_modified DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, datetime_added DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE order_items (id INT AUTO_INCREMENT NOT NULL, order_id INT NOT NULL, part_id INT DEFAULT NULL, supplier_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, quantity DOUBLE PRECISION NOT NULL, supplier_part_nr VARCHAR(255) DEFAULT NULL, last_modified DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, datetime_added DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, INDEX IDX_62809DB08D9F6D38 (order_id), INDEX IDX_62809DB04CE34BEC (part_id), INDEX IDX_62809DB02ADD6D8C (supplier_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE order_supplier_references (id INT AUTO_INCREMENT NOT NULL, order_id INT NOT NULL, supplier_id INT DEFAULT NULL, order_number VARCHAR(255) NOT NULL, last_modified DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, datetime_added DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, INDEX IDX_31A9D8078D9F6D38 (order_id), INDEX IDX_31A9D8072ADD6D8C (supplier_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE order_items ADD CONSTRAINT FK_62809DB08D9F6D38 FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE order_items ADD CONSTRAINT FK_62809DB04CE34BEC FOREIGN KEY (part_id) REFERENCES parts (id) ON DELETE SET NULL');
         $this->addSql('ALTER TABLE order_items ADD CONSTRAINT FK_62809DB02ADD6D8C FOREIGN KEY (supplier_id) REFERENCES suppliers (id) ON DELETE SET NULL');
@@ -43,8 +43,8 @@ final class Version20260617000000 extends AbstractMultiPlatformMigration
         $this->addSql('CREATE INDEX IDX_62809DB04CE34BEC ON order_items (part_id)');
         $this->addSql('CREATE INDEX IDX_62809DB02ADD6D8C ON order_items (supplier_id)');
         $this->addSql('CREATE TABLE order_supplier_references (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, order_id INTEGER NOT NULL, supplier_id INTEGER DEFAULT NULL, order_number VARCHAR(255) NOT NULL, last_modified DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, datetime_added DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, CONSTRAINT FK_F2E8BB278D9F6D38 FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_F2E8BB272ADD6D8C FOREIGN KEY (supplier_id) REFERENCES suppliers (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE)');
-        $this->addSql('CREATE INDEX IDX_F2E8BB278D9F6D38 ON order_supplier_references (order_id)');
-        $this->addSql('CREATE INDEX IDX_F2E8BB272ADD6D8C ON order_supplier_references (supplier_id)');
+        $this->addSql('CREATE INDEX IDX_31A9D8078D9F6D38 ON order_supplier_references (order_id)');
+        $this->addSql('CREATE INDEX IDX_31A9D8072ADD6D8C ON order_supplier_references (supplier_id)');
     }
 
     public function sqLiteDown(Schema $schema): void
@@ -65,8 +65,8 @@ final class Version20260617000000 extends AbstractMultiPlatformMigration
         $this->addSql('CREATE INDEX IDX_62809DB04CE34BEC ON order_items (part_id)');
         $this->addSql('CREATE INDEX IDX_62809DB02ADD6D8C ON order_items (supplier_id)');
         $this->addSql('CREATE TABLE order_supplier_references (id INT NOT NULL, order_id INT NOT NULL, supplier_id INT DEFAULT NULL, order_number VARCHAR(255) NOT NULL, last_modified TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL, datetime_added TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE INDEX IDX_F2E8BB278D9F6D38 ON order_supplier_references (order_id)');
-        $this->addSql('CREATE INDEX IDX_F2E8BB272ADD6D8C ON order_supplier_references (supplier_id)');
+        $this->addSql('CREATE INDEX IDX_31A9D8078D9F6D38 ON order_supplier_references (order_id)');
+        $this->addSql('CREATE INDEX IDX_31A9D8072ADD6D8C ON order_supplier_references (supplier_id)');
         $this->addSql('ALTER TABLE order_items ADD CONSTRAINT FK_62809DB08D9F6D38 FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE order_items ADD CONSTRAINT FK_62809DB04CE34BEC FOREIGN KEY (part_id) REFERENCES parts (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE order_items ADD CONSTRAINT FK_62809DB02ADD6D8C FOREIGN KEY (supplier_id) REFERENCES suppliers (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
