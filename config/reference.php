@@ -1368,14 +1368,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         html_to_text_converter?: scalar|Param|null, // A service implementing the "Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface". // Default: null
  *     },
  * }
- * @psalm-type WebProfilerConfig = array{
- *     toolbar?: bool|array{ // Profiler toolbar configuration
- *         enabled?: bool|Param, // Default: false
- *         ajax_replace?: bool|Param, // Replace toolbar on AJAX requests // Default: false
- *     },
- *     intercept_redirects?: bool|Param, // Default: false
- *     excluded_ajax_paths?: scalar|Param|null, // Default: "^/((index|app(_[\\w]+)?)\\.php/)?_wdt"
- * }
  * @psalm-type MonologConfig = array{
  *     use_microseconds?: scalar|Param|null, // Default: true
  *     channels?: list<scalar|Param|null>,
@@ -1519,18 +1511,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         },
  *     }>,
  * }
- * @psalm-type DebugConfig = array{
- *     max_items?: int|Param, // Max number of displayed items past the first level, -1 means no limit. // Default: 2500
- *     min_depth?: int|Param, // Minimum tree depth to clone all the items, 1 is default. // Default: 1
- *     max_string_length?: int|Param, // Max length of displayed strings, -1 means no limit. // Default: -1
- *     dump_destination?: scalar|Param|null, // A stream URL where dumps should be written to. // Default: null
- *     theme?: "dark"|"light"|Param, // Changes the color of the dump() output when rendered directly on the templating. "dark" (default) or "light". // Default: "dark"
- * }
- * @psalm-type MakerConfig = array{
- *     root_namespace?: scalar|Param|null, // Default: "App"
- *     generate_final_classes?: bool|Param, // Default: true
- *     generate_final_entities?: bool|Param, // Default: false
- * }
  * @psalm-type WebpackEncoreConfig = array{
  *     output_path?: scalar|Param|null, // The path where Encore is building the assets - i.e. Encore.setOutputPath()
  *     crossorigin?: false|"anonymous"|"use-credentials"|Param, // crossorigin value when Encore.enableIntegrityHashes() is used, can be false (default), anonymous or use-credentials // Default: false
@@ -1656,12 +1636,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         post_processors?: array<string, array<string, mixed>>,
  *     },
  * }
- * @psalm-type DamaDoctrineTestConfig = array{
- *     enable_static_connection?: mixed, // Default: true
- *     enable_static_meta_data_cache?: bool|Param, // Default: true
- *     enable_static_query_cache?: bool|Param, // Default: true
- *     connection_keys?: list<mixed>,
- * }
  * @psalm-type TwigExtraConfig = array{
  *     cache?: bool|array{
  *         enabled?: bool|Param, // Default: false
@@ -1713,7 +1687,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     length?: scalar|Param|null, // Default: 5
  *     width?: scalar|Param|null, // Default: 130
  *     height?: scalar|Param|null, // Default: 50
- *     font?: scalar|Param|null, // Default: "/home/jan/php/Part-DB-server/vendor/gregwar/captcha-bundle/DependencyInjection/../Generator/Font/captcha.ttf"
+ *     font?: scalar|Param|null, // Default: "/var/www/html/vendor/gregwar/captcha-bundle/DependencyInjection/../Generator/Font/captcha.ttf"
  *     keep_value?: scalar|Param|null, // Default: false
  *     charset?: scalar|Param|null, // Default: "abcdefhjkmnprstuvwxyz23456789"
  *     as_file?: scalar|Param|null, // Default: false
@@ -2413,13 +2387,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         invalidate_on_env_change?: bool|Param, // Default: true
  *     },
  * }
- * @psalm-type JbtronicsTranslationEditorConfig = array{
- *     translations_path?: scalar|Param|null, // Default: "%translator.default_path%"
- *     format?: scalar|Param|null, // Default: "xlf"
- *     xliff_version?: scalar|Param|null, // Default: "2.0"
- *     use_intl_icu_format?: bool|Param, // Default: false
- *     writer_options?: list<scalar|Param|null>,
- * }
  * @psalm-type ApiPlatformConfig = array{
  *     title?: scalar|Param|null, // The title of the API. // Default: ""
  *     description?: scalar|Param|null, // The description of the API. // Default: ""
@@ -2581,7 +2548,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         validation_error_resource_class?: scalar|Param|null, // The class used to represent validation errors in the OpenAPI documentation. // Default: null
  *     },
  *     maker?: bool|array{
- *         enabled?: bool|Param, // Default: true
+ *         enabled?: bool|Param, // Default: false
  *         namespace_prefix?: scalar|Param|null, // Add a prefix to all maker generated classes. e.g set it to "Api" to set the maker namespace to "App\Api\" (if the maker.root_namespace config is App). e.g. App\Api\State\MyStateProcessor // Default: ""
  *     },
  *     mcp?: bool|array{
@@ -3224,10 +3191,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         security?: SecurityConfig,
  *         twig?: TwigConfig,
- *         web_profiler?: WebProfilerConfig,
  *         monolog?: MonologConfig,
- *         debug?: DebugConfig,
- *         maker?: MakerConfig,
  *         webpack_encore?: WebpackEncoreConfig,
  *         datatables?: DatatablesConfig,
  *         liip_imagine?: LiipImagineConfig,
@@ -3246,7 +3210,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         knpu_oauth2_client?: KnpuOauth2ClientConfig,
  *         nelmio_cors?: NelmioCorsConfig,
  *         jbtronics_settings?: JbtronicsSettingsConfig,
- *         jbtronics_translation_editor?: JbtronicsTranslationEditorConfig,
  *         api_platform?: ApiPlatformConfig,
  *         ai?: AiConfig,
  *     },
@@ -3321,13 +3284,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         security?: SecurityConfig,
  *         twig?: TwigConfig,
- *         web_profiler?: WebProfilerConfig,
  *         monolog?: MonologConfig,
- *         debug?: DebugConfig,
  *         webpack_encore?: WebpackEncoreConfig,
  *         datatables?: DatatablesConfig,
  *         liip_imagine?: LiipImagineConfig,
- *         dama_doctrine_test?: DamaDoctrineTestConfig,
  *         twig_extra?: TwigExtraConfig,
  *         gregwar_captcha?: GregwarCaptchaConfig,
  *         florianv_swap?: FlorianvSwapConfig,

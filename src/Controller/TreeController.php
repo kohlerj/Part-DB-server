@@ -24,6 +24,7 @@ namespace App\Controller;
 
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Response;
+use App\Entity\OrderSystem\Order;
 use App\Entity\ProjectSystem\Project;
 use App\Entity\Parts\Category;
 use App\Entity\Parts\Footprint;
@@ -124,6 +125,18 @@ class TreeController extends AbstractController
     {
         if ($this->isGranted('@projects.read')) {
             $tree = $this->treeGenerator->getTreeView(Project::class, $device, 'devices');
+        } else {
+            return new JsonResponse("Access denied", Response::HTTP_FORBIDDEN);
+        }
+
+        return new JsonResponse($tree);
+    }
+
+    #[Route(path: '/orders', name: 'tree_orders')]
+    public function ordersTree(): JsonResponse
+    {
+        if ($this->isGranted('@orders.read')) {
+            $tree = $this->treeGenerator->getTreeView(Order::class, null, 'orders');
         } else {
             return new JsonResponse("Access denied", Response::HTTP_FORBIDDEN);
         }

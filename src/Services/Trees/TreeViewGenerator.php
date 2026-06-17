@@ -30,6 +30,7 @@ use App\Entity\Parts\Footprint;
 use App\Entity\Parts\Manufacturer;
 use App\Entity\Parts\StorageLocation;
 use App\Entity\Parts\Supplier;
+use App\Entity\OrderSystem\Order;
 use App\Entity\ProjectSystem\Project;
 use App\Helpers\Trees\TreeViewNode;
 use App\Helpers\Trees\TreeViewNodeIterator;
@@ -155,6 +156,10 @@ class TreeViewGenerator
             $href_type = 'list_parts';
         }
 
+        if ($mode === 'orders') {
+            $href_type = 'info';
+        }
+
         $generic = $this->getGenericTree($class, $parent);
         $treeIterator = new TreeViewNodeIterator($generic);
         $recursiveIterator = new RecursiveIteratorIterator($treeIterator, RecursiveIteratorIterator::SELF_FIRST);
@@ -179,7 +184,7 @@ class TreeViewGenerator
             }
         }
 
-        if (($mode === 'list_parts_root' || $mode === 'devices') && $this->rootNodeEnabled) {
+        if (($mode === 'list_parts_root' || $mode === 'devices' || $mode === 'orders') && $this->rootNodeEnabled) {
             $root_node = new TreeViewNode($this->entityClassToRootNodeString($class), $this->entityClassToRootNodeHref($class), $generic);
             $root_node->setExpanded($this->rootNodeExpandedByDefault);
             $root_node->setIcon($this->entityClassToRootNodeIcon($class));
@@ -201,12 +206,14 @@ class TreeViewGenerator
                 Manufacturer::class => $this->router->generate('manufacturer_new'),
                 Supplier::class => $this->router->generate('supplier_new'),
                 Project::class => $this->router->generate('project_new'),
+                Order::class => $this->router->generate('order_new'),
                 default => null,
             };
         }
 
         return match ($class) {
             Project::class => $this->router->generate('project_new'),
+            Order::class => $this->router->generate('order_list'),
             default => $this->router->generate('parts_show_all')
         };
     }
@@ -226,6 +233,7 @@ class TreeViewGenerator
             Manufacturer::class => $icon.'fa-industry',
             Supplier::class => $icon.'fa-truck',
             Project::class => $icon.'fa-archive',
+            Order::class => $icon.'fa-truck',
             default => null,
         };
     }

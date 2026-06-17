@@ -74,7 +74,7 @@ use function sprintf;
     3 => FootprintParameter::class, 4 => GroupParameter::class, 5 => ManufacturerParameter::class,
     6 => MeasurementUnitParameter::class, 7 => PartParameter::class, 8 => StorageLocationParameter::class,
     9 => SupplierParameter::class, 10 => AttachmentTypeParameter::class,
-    12 => PartCustomStateParameter::class])]
+    12 => PartCustomStateParameter::class, 13 => OrderParameter::class])]
 #[ORM\Table('parameters')]
 #[ORM\Index(columns: ['name'], name: 'parameter_name_idx')]
 #[ORM\Index(columns: ['param_group'], name: 'parameter_group_idx')]

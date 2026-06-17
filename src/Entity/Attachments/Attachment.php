@@ -102,7 +102,7 @@ abstract class Attachment extends AbstractNamedDBElement
         'Category' => CategoryAttachment::class, 'Footprint' => FootprintAttachment::class, 'Manufacturer' => ManufacturerAttachment::class,
         'Currency' => CurrencyAttachment::class, 'Group' => GroupAttachment::class, 'MeasurementUnit' => MeasurementUnitAttachment::class,
         'Storelocation' => StorageLocationAttachment::class, 'Supplier' => SupplierAttachment::class,
-        'User' => UserAttachment::class, 'LabelProfile' => LabelAttachment::class];
+        'User' => UserAttachment::class, 'LabelProfile' => LabelAttachment::class, 'Order' => OrderAttachment::class];
 
     /*
      * The discriminator map used for API platform. The key should be the same as the api platform short type (the @type JSONLD field).
@@ -111,7 +111,8 @@ abstract class Attachment extends AbstractNamedDBElement
         "AttachmentType" => AttachmentTypeAttachment::class,
         "Category" => CategoryAttachment::class, "Footprint" => FootprintAttachment::class, "Manufacturer" => ManufacturerAttachment::class,
         "Currency" => CurrencyAttachment::class, "Group" => GroupAttachment::class, "MeasurementUnit" => MeasurementUnitAttachment::class,
-        "StorageLocation" => StorageLocationAttachment::class, "Supplier" => SupplierAttachment::class, "User" => UserAttachment::class, "LabelProfile" => LabelAttachment::class];
+        "StorageLocation" => StorageLocationAttachment::class, "Supplier" => SupplierAttachment::class, "User" => UserAttachment::class, "LabelProfile" => LabelAttachment::class,
+        "Order" => OrderAttachment::class];
 
     /**
      * A list of file extensions, that browsers can show directly as image.

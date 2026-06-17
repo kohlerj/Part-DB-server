@@ -1,0 +1,27 @@
+services:
+  partdb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      # Persist user uploads and media locally
+      - ./docker-data/uploads:/var/www/html/uploads
+      - ./docker-data/media:/var/www/html/public/media
+      - ./docker-data/db:/var/www/html/var/db
+      # Mount source directories — changes are reflected without rebuilding
+      - ./src:/var/www/html/src
+      - ./templates:/var/www/html/templates
+      - ./config:/var/www/html/config
+      - ./translations:/var/www/html/translations
+    environment:
+      DATABASE_URL: sqlite:///%kernel.project_dir%/uploads/app.db
+      APP_ENV: docker
+      APP_DEBUG: "1"
+      APP_SECRET: 318b5d659e07a0b3f96d9b3a83b254ca
+      # Automatically run migrations on startup
+      DB_AUTOMIGRATE: "true"
+      DEFAULT_URI: "http://localhost:8080/"
+      MAILER_DSN: "null://null"
+
