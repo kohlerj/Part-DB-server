@@ -57,7 +57,7 @@ final class OrderItemVoter extends Voter
 
         $order = $subject->getOrder();
         if ($order === null) {
-            return true;
+            return false;
         }
 
         if ($attribute === 'read') {
