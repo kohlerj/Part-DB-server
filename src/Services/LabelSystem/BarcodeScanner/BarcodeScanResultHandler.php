@@ -312,6 +312,58 @@ final readonly class BarcodeScanResultHandler
     }
 
     /**
+     * Extracts the stock information (amount and order number) contained in a vendor barcode scan result.
+     * In contrast to getCreateInfos(), this does not perform any info provider lookups (so no network access is done)
+     * and works independently of whether the corresponding provider is active. It is intended for adding stock to an
+     * already existing part based on the scanned barcode.
+     *
+     * @param  BarcodeScanResultInterface  $scanResult
+     * @return array{amount: float, lotName: string|null, lotUserBarcode: string|null}|null Returns null if the scan
+     *         result does not contain a usable stock amount.
+     */
+    public function getStockInfo(BarcodeScanResultInterface $scanResult): ?array
+    {
+        if ($scanResult instanceof TMEBarcodeScanResult) {
+            if ($scanResult->quantity === null || $scanResult->quantity <= 0) {
+                return null;
+            }
+            return [
+                'amount' => (float) $scanResult->quantity,
+                'lotName' => $scanResult->purchaseOrder,
+                'lotUserBarcode' => $scanResult->rawInput,
+            ];
+        }
+
+        if ($scanResult instanceof LCSCBarcodeScanResult) {
+            if ($scanResult->quantity === null || $scanResult->quantity <= 0) {
+                return null;
+            }
+            return [
+                'amount' => (float) $scanResult->quantity,
+                'lotName' => $scanResult->orderNumber ?? $scanResult->pickBatchNumber,
+                'lotUserBarcode' => $scanResult->rawInput,
+            ];
+        }
+
+        if ($scanResult instanceof EIGP114BarcodeScanResult) {
+            if ($scanResult->quantity === null || $scanResult->quantity <= 0) {
+                return null;
+            }
+            $vendor = $scanResult->guessBarcodeVendor();
+            $lotName = $vendor === 'digikey'
+                ? ($scanResult->digikeyInvoiceNumber ?? $scanResult->digikeySalesOrderNumber ?? $scanResult->customerPO)
+                : $scanResult->customerPO;
+            return [
+                'amount' => (float) $scanResult->quantity,
+                'lotName' => $lotName,
+                'lotUserBarcode' => $scanResult->rawInput,
+            ];
+        }
+
+        return null;
+    }
+
+    /**
      * @param  EIGP114BarcodeScanResult  $scanResult
      * * @return array{providerKey: string, providerId: string, lotAmount?: float|int, lotName?: string, lotUserBarcode?: string}|null
      */
