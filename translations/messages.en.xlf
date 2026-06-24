@@ -13061,6 +13061,54 @@ Buerklin-API Authentication server:
         <target>Create [part] from barcode</target>
       </segment>
     </unit>
+    <unit id="scanAddStTtl" name="label_scanner.add_stock.title">
+      <segment state="translated">
+        <source>label_scanner.add_stock.title</source>
+        <target>Add stock to existing [part]</target>
+      </segment>
+    </unit>
+    <unit id="scanAddStHlp" name="label_scanner.add_stock.help">
+      <segment state="translated">
+        <source>label_scanner.add_stock.help</source>
+        <target>The scanned barcode contains a quantity and order number. You can add this amount as a new stock lot to the existing [part].</target>
+      </segment>
+    </unit>
+    <unit id="scanAddStBtn" name="label_scanner.add_stock.btn">
+      <segment state="translated">
+        <source>label_scanner.add_stock.btn</source>
+        <target>Add stock from barcode</target>
+      </segment>
+    </unit>
+    <unit id="scanAddStOrd" name="label_scanner.add_stock.order_number">
+      <segment state="translated">
+        <source>label_scanner.add_stock.order_number</source>
+        <target>Order number</target>
+      </segment>
+    </unit>
+    <unit id="scanAddStSuc" name="label_scanner.add_stock.success">
+      <segment state="translated">
+        <source>label_scanner.add_stock.success</source>
+        <target>Stock successfully added to the [part].</target>
+      </segment>
+    </unit>
+    <unit id="scanAddStNoA" name="label_scanner.add_stock.no_amount">
+      <segment state="translated">
+        <source>label_scanner.add_stock.no_amount</source>
+        <target>The scanned barcode does not contain a usable stock amount.</target>
+      </segment>
+    </unit>
+    <unit id="scanAddStTgt" name="label_scanner.add_stock.target_lot">
+      <segment state="translated">
+        <source>label_scanner.add_stock.target_lot</source>
+        <target>Add stock to</target>
+      </segment>
+    </unit>
+    <unit id="scanAddStNew" name="label_scanner.add_stock.new_lot">
+      <segment state="translated">
+        <source>label_scanner.add_stock.new_lot</source>
+        <target>New lot (from this order)</target>
+      </segment>
+    </unit>
     <unit id="xH258F." name="parts.create_from_scan.title">
       <segment state="translated">
         <source>parts.create_from_scan.title</source>

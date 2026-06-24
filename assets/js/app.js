@@ -36,7 +36,7 @@ const $ = require('jquery');
 //Only include javascript
 import '@fortawesome/fontawesome-free/css/all.css'
 
-require('bootstrap');
+window.bootstrap = require('bootstrap');
 
 import "./error_handler";
 import "./tab_remember";

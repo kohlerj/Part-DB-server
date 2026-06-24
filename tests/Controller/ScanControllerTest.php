@@ -51,4 +51,16 @@ final class ScanControllerTest extends WebTestCase
         $this->client->request('GET', '/scan/part/1');
         $this->assertResponseRedirects('/en/part/1');
     }
+
+    public function testAddStockRejectsInvalidCsrf(): void
+    {
+        $url = static::getContainer()->get('router')->generate('scan_add_stock');
+        $this->client->request('POST', $url, [
+            '_token' => 'invalid-token',
+            'input' => base64_encode('0000001'),
+            'mode' => '',
+        ]);
+        //An invalid CSRF token must not perform any action, but redirect back to the scan dialog
+        $this->assertResponseRedirects('/en/scan');
+    }
 }

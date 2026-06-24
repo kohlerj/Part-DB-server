@@ -189,3 +189,9 @@
         </div>
     </div>
 {% endblock %}
+
+{% block additional_content %}
+    {% if open_add_lot_modal is defined and open_add_lot_modal %}
+        <div {{ stimulus_controller('pages/auto-open-modal', {modalId: 'add-lot-modal'}) }}></div>
+    {% endif %}
+{% endblock %}
