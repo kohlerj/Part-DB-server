@@ -13,11 +13,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.PAT }}
 
       - uses: fopina/upstream-to-pr@v1
         with:
-          token: ${{ secrets.PAT }}
           upstream-repository: https://github.com/Part-DB/Part-DB-server
           upstream-tag: 'v\d+.\d+\.\d+'
           
