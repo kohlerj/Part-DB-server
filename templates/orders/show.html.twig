@@ -65,6 +65,8 @@
             {% trans %}order.supplier_reference.add{% endtrans %}
         </button>
     </div>
+    {# Mark the collection as rendered so form_end()'s form_rest does not output it again below the buttons #}
+    {% do form.supplierReferences.setRendered() %}
 
     <hr>
 
@@ -136,6 +138,8 @@
             </button>
         {% endif %}
     </div>
+    {# Mark the collection as rendered so form_end()'s form_rest does not output it again below the buttons #}
+    {% do form.items.setRendered() %}
 
     {% if is_granted('edit', order) %}
         <div class="mt-3">
