@@ -205,6 +205,8 @@ class OrderController extends AbstractController
                     $targetLot->setAmount(0);
                     $this->entityManager->persist($targetLot);
                     $part->addPartLot($targetLot);
+                    //Flush so the new lot gets an ID, which is required when creating the stock change log entry
+                    $this->entityManager->flush();
                 }
 
                 $this->withdrawAddHelper->add($targetLot, $receivedQty, 'Received from order: ' . $order->getName());
