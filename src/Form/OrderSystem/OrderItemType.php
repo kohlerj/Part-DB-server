@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Form\OrderSystem;
 
 use App\Entity\OrderSystem\OrderItem;
+use App\Entity\Parts\Part;
 use App\Entity\Parts\Supplier;
 use App\Form\Type\PartSelectType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -31,6 +32,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OrderItemType extends AbstractType
@@ -40,11 +43,7 @@ class OrderItemType extends AbstractType
         $builder
             ->add('part', PartSelectType::class, [
                 'required' => false,
-                'label' => 'order.item.part',
-            ])
-            ->add('name', TextType::class, [
                 'label' => 'order.item.name',
-                'required' => true,
             ])
             ->add('quantity', NumberType::class, [
                 'label' => 'order.item.quantity',
@@ -64,6 +63,13 @@ class OrderItemType extends AbstractType
                 'label' => 'order.item.supplier_part_nr',
                 'attr' => ['class' => 'js-order-item-sku'],
             ]);
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, static function (FormEvent $event): void {
+            $item = $event->getData();
+            if ($item instanceof OrderItem && $item->getName() === '' && $item->getPart() instanceof Part) {
+                $item->setName($item->getPart()->getName());
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

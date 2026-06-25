@@ -2,7 +2,7 @@
     "name": "Part-DB (PHP / Symfony)",
     // Debian-based PHP image that bundles Composer and the `install-php-extensions` helper.
     // PHP 8.3 satisfies the project requirement of ^8.2 (production runs on 8.4).
-    "image": "mcr.microsoft.com/devcontainers/php:8.3-bookworm",
+    "image": "mcr.microsoft.com/devcontainers/php:8.4-trixie",
     "features": {
         "ghcr.io/devcontainers/features/node:1": {
             "version": "22"
@@ -42,7 +42,7 @@
             ],
             "settings": {
                 "php.validate.executablePath": "/usr/local/bin/php",
-                "intelephense.environment.phpVersion": "8.3.0",
+                "intelephense.environment.phpVersion": "8.4.0",
                 "files.eol": "\n"
             }
         }
