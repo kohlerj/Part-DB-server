@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Form\OrderSystem;
 
 use App\Entity\OrderSystem\Order;
+use App\Entity\OrderSystem\OrderItem;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -62,6 +63,7 @@ class OrderType extends AbstractType
                 'allow_delete' => true,
                 'by_reference' => false,
                 'required' => false,
+                'prototype_data' => new OrderItem(),
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'save',
