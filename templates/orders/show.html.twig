@@ -91,7 +91,6 @@
                         <tr class="collection-item">
                             <td>
                                 {{ form_widget(itemForm.part) }}
-                                {{ form_widget(itemForm.name, {'attr': {'class': 'd-none'}}) }}
                                 {% if itemForm.vars.data.part is not null %}
                                     {% set part_description = itemForm.vars.data.part.description|striptags|trim %}
                                     {% if part_description is not empty %}
