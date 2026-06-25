@@ -153,8 +153,7 @@ There you will find various methods to support development on a monthly or a one
 
 * **Jan Böhmer** - *Initial work* - [GitHub](https://github.com/jbtronics/)
 
-See also the list of [contributors](https://github.com/Part-DB/Part-DB-server/graphs/contributors) who participated in
-this project.
+See also the list of [contributors](https://github.com/Part-DB/Part-DB-server/graphs/contributors) who participated in this project.
 
 Based on the original Part-DB by Christoph Lechner and K. Jacobs
 

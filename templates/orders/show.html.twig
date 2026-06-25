@@ -68,6 +68,10 @@
 
     <hr>
 
+    {# Add the order_item_widget block so the prototype for new items renders as a proper <tr> row.
+       Note: no "only" keyword, so the global form themes (TomSelect, part select, etc.) still apply. #}
+    {% form_theme form.items with ['form/order_item_layout.html.twig'] %}
+
     {# Items table #}
     <h5><i class="fa-solid fa-list fa-fw"></i> {% trans %}order.items{% endtrans %}
         <span class="badge bg-secondary">{{ order.items | length }}</span>
@@ -78,18 +82,18 @@
             <table class="table table-sm table-hover align-middle" id="order-items-table" {{ collection.target() }}>
                 <thead class="table-light">
                     <tr>
-                        <th>{% trans %}order.item.name{% endtrans %}</th>
+                        <th class="text-nowrap">{% trans %}order.item.name{% endtrans %}</th>
                         <th></th>
-                        <th>{% trans %}order.item.quantity{% endtrans %}</th>
-                        <th>{% trans %}order.item.supplier{% endtrans %}</th>
-                        <th>{% trans %}order.item.supplier_part_nr{% endtrans %}</th>
+                        <th class="text-nowrap">{% trans %}order.item.quantity{% endtrans %}</th>
+                        <th class="text-nowrap">{% trans %}order.item.supplier{% endtrans %}</th>
+                        <th class="text-nowrap">{% trans %}order.item.supplier_part_nr{% endtrans %}</th>
                         {% if is_granted('edit', order) %}<th></th>{% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for itemForm in form.items %}
-                        <tr class="collection-item">
-                            <td>
+                        <tr class="collection-item{% if itemForm.vars.data.id is null %} table-primary{% endif %}">
+                            <td style="min-width: 200px">
                                 {{ form_widget(itemForm.part) }}
                                 {% if itemForm.vars.data.part is not null %}
                                     {% set part_description = itemForm.vars.data.part.description|striptags|trim %}
@@ -110,8 +114,8 @@
                                 {% endif %}
                             </td>
                             <td>{{ form_widget(itemForm.quantity, {'attr': {'style': 'width:100px'}}) }}</td>
-                            <td>{{ form_widget(itemForm.supplier) }}</td>
-                            <td>{{ form_widget(itemForm.supplierPartNr) }}</td>
+                            <td style="min-width: 150px">{{ form_widget(itemForm.supplier) }}</td>
+                            <td style="min-width: 120px">{{ form_widget(itemForm.supplierPartNr) }}</td>
                             {% if is_granted('edit', order) %}
                                 <td>
                                     <button type="button" class="btn btn-sm btn-outline-danger" {{ collection.delete_btn() }}>
@@ -173,6 +177,7 @@
                 return;
             }
             const baseUrl = {{ path('order_part_orderdetails')|json_encode|raw }};
+            const skuMissingPlaceholder = {{ 'order.item.sku_missing'|trans|json_encode|raw }};
             const cache = {};
 
             function rowOf(el) {
@@ -185,7 +190,10 @@
 
             function partIdOf(row) {
                 const ps = partSelectOf(row);
-                return ps ? ps.value : '';
+                if (!ps) {
+                    return '';
+                }
+                return ps.tomselect ? ps.tomselect.getValue() : ps.value;
             }
 
             function fetchOrderdetails(partId) {
@@ -219,37 +227,46 @@
                 return out;
             }
 
+            function supplierValueOf(select) {
+                if (!select) {
+                    return '';
+                }
+                // When TomSelect manages the select, its value is the source of truth
+                return select.tomselect ? select.tomselect.getValue() : select.value;
+            }
+
+            function supplierTextOf(select) {
+                const ts = select.tomselect;
+                if (ts) {
+                    const val = ts.getValue();
+                    const opt = val ? ts.options[val] : null;
+                    return opt ? (opt.text || '') : '';
+                }
+                const opt = select.options[select.selectedIndex];
+                return opt ? opt.textContent : '';
+            }
+
             function populateSuppliers(row, ods, keepSelection) {
                 const select = row.querySelector('.js-order-item-supplier');
                 if (!select) {
                     return;
                 }
-                const previous = select.value;
-                const prevOption = select.options[select.selectedIndex];
-                const previousText = prevOption ? prevOption.textContent : '';
+                const ts = select.tomselect;
+                const previous = supplierValueOf(select);
+                const previousText = supplierTextOf(select);
                 const suppliers = uniqueSuppliers(ods);
 
-                select.innerHTML = '';
-                const empty = document.createElement('option');
-                empty.value = '';
-                empty.textContent = '';
-                select.appendChild(empty);
-
+                // Build the desired list of options ([value, text])
+                const options = [{value: '', text: ''}];
                 const included = new Set();
                 suppliers.forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.id;
-                    opt.textContent = s.name;
-                    select.appendChild(opt);
+                    options.push({value: s.id, text: s.name});
                     included.add(s.id);
                 });
 
                 // Preserve a previously saved supplier even if it is not among the part's order details
                 if (keepSelection && previous && !included.has(previous)) {
-                    const opt = document.createElement('option');
-                    opt.value = previous;
-                    opt.textContent = previousText;
-                    select.appendChild(opt);
+                    options.push({value: previous, text: previousText});
                     included.add(previous);
                 }
 
@@ -259,7 +276,25 @@
                 } else if (suppliers.length > 0) {
                     value = suppliers[0].id;
                 }
-                select.value = value;
+
+                if (ts) {
+                    // Drive TomSelect through its API so the dropdown and the
+                    // underlying <select> value stay in sync.
+                    ts.clear(true);
+                    ts.clearOptions(() => false);
+                    options.forEach(o => ts.addOption({value: o.value, text: o.text}));
+                    ts.refreshOptions(false);
+                    ts.setValue(value, true);
+                } else {
+                    select.innerHTML = '';
+                    options.forEach(o => {
+                        const opt = document.createElement('option');
+                        opt.value = o.value;
+                        opt.textContent = o.text;
+                        select.appendChild(opt);
+                    });
+                    select.value = value;
+                }
             }
 
             function updateSku(row) {
@@ -269,7 +304,7 @@
                     return;
                 }
                 const ods = cache[partIdOf(row)] || [];
-                const sid = select ? select.value : '';
+                const sid = supplierValueOf(select);
                 let sku = '';
                 if (sid) {
                     const match = ods.find(od => String(od.supplier_id) === String(sid));
@@ -278,6 +313,8 @@
                     }
                 }
                 skuInput.value = sku;
+                // Show a greyed-out placeholder when a supplier is selected but no SKU is available
+                skuInput.placeholder = (sid && !sku) ? skuMissingPlaceholder : '';
             }
 
             function onPartChange(row) {

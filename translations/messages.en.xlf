@@ -14028,5 +14028,11 @@ Buerklin-API Authentication server:
         <target>Delete</target>
       </segment>
     </unit>
+    <unit id="ord.050" name="order.item.sku_missing">
+      <segment state="translated">
+        <source>order.item.sku_missing</source>
+        <target>missing</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
