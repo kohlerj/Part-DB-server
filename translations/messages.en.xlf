@@ -13740,6 +13740,18 @@ Buerklin-API Authentication server:
         <target>Order items</target>
       </segment>
     </unit>
+    <unit id="ord.002c" name="order_supplier_reference.label">
+      <segment state="translated">
+        <source>order_supplier_reference.label</source>
+        <target>Order supplier reference</target>
+      </segment>
+    </unit>
+    <unit id="ord.002d" name="order_supplier_reference.labelp">
+      <segment state="translated">
+        <source>order_supplier_reference.labelp</source>
+        <target>Order supplier references</target>
+      </segment>
+    </unit>
     <unit id="ord.003" name="order.name">
       <segment state="translated">
         <source>order.name</source>

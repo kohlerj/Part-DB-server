@@ -43,6 +43,7 @@ use App\Entity\PriceInformations\Orderdetail;
 use App\Entity\PriceInformations\Pricedetail;
 use App\Entity\OrderSystem\Order;
 use App\Entity\OrderSystem\OrderItem;
+use App\Entity\OrderSystem\OrderSupplierReference;
 use App\Entity\ProjectSystem\Project;
 use App\Entity\ProjectSystem\ProjectBOMEntry;
 use App\Entity\UserSystem\Group;
@@ -77,6 +78,7 @@ enum LogTargetType: int
     case PART_CUSTOM_STATE = 23;
     case ORDER = 24;
     case ORDER_ITEM = 25;
+    case ORDER_SUPPLIER_REFERENCE = 26;
 
     /**
      * Returns the class name of the target type or null if the target type is NONE.
@@ -111,6 +113,7 @@ enum LogTargetType: int
             self::PART_CUSTOM_STATE => PartCustomState::class,
             self::ORDER => Order::class,
             self::ORDER_ITEM => OrderItem::class,
+            self::ORDER_SUPPLIER_REFERENCE => OrderSupplierReference::class,
         };
     }
 
