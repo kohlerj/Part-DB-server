@@ -1,0 +1,51 @@
+{
+    "name": "Part-DB (PHP / Symfony)",
+    // Debian-based PHP image that bundles Composer and the `install-php-extensions` helper.
+    // PHP 8.3 satisfies the project requirement of ^8.2 (production runs on 8.4).
+    "image": "mcr.microsoft.com/devcontainers/php:8.4-trixie",
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "22"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    // Run Part-DB in development mode inside the container.
+    "containerEnv": {
+        "APP_ENV": "dev",
+        "APP_DEBUG": "1",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8"
+    },
+    // 8000 -> `symfony serve` / `php -S 0.0.0.0:8000 -t public`
+    "forwardPorts": [
+        8000
+    ],
+    "portsAttributes": {
+        "8000": {
+            "label": "Part-DB",
+            "onAutoForward": "notify"
+        }
+    },
+    // Installs PHP extensions, Composer + Yarn dependencies and sets up the dev database.
+    "postCreateCommand": "bash .devcontainer/post-create.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "xdebug.php-debug",
+                "neilbrayfield.php-docblocker",
+                "MehediDracula.php-namespace-resolver",
+                "mblode.twig-language-2",
+                "dbaeumer.vscode-eslint",
+                "EditorConfig.EditorConfig",
+                "ms-azuretools.vscode-docker"
+            ],
+            "settings": {
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "intelephense.environment.phpVersion": "8.4.0",
+                "files.eol": "\n"
+            }
+        }
+    },
+    "remoteUser": "vscode"
+}

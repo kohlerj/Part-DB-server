@@ -1,0 +1,22 @@
+name: upstream to PR
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  autoupdate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: fopina/upstream-to-pr@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          upstream-repository: https://github.com/Part-DB/Part-DB-server
+          upstream-tag: 'v\d+.\d+\.\d+'
+          

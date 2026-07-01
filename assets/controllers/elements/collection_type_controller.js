@@ -78,7 +78,8 @@ export default class extends Controller {
         //Insert new html after the last child element
         //If the table has a tbody, insert it there
         //Afterwards return the newly created row
-        if(targetTable.tBodies[0]) {
+        if (targetTable.tBodies && targetTable.tBodies[0]) {
+
             targetTable.tBodies[0].insertAdjacentHTML('beforeend', newElementStr);
             ret = targetTable.tBodies[0].lastElementChild;
         } else { //Otherwise just insert it

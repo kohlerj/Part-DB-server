@@ -51,6 +51,9 @@ use App\Services\LabelSystem\BarcodeScanner\BarcodeSourceType;
 use App\Services\LabelSystem\BarcodeScanner\LocalBarcodeScanResult;
 use App\Services\LabelSystem\BarcodeScanner\LCSCBarcodeScanResult;
 use App\Services\LabelSystem\BarcodeScanner\EIGP114BarcodeScanResult;
+use App\Entity\Parts\PartLot;
+use App\Services\Parts\PartLotWithdrawAddHelper;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -105,6 +108,28 @@ class ScanController extends AbstractController
                     // Try to get an Info URL if possible
                     $url = $this->resultHandler->getInfoURL($scan);
                     if ($url !== null) {
+                        // If the barcode carries stock info, redirect to the part page with the add-lot
+                        // modal pre-filled (description = order number, amount = scanned quantity),
+                        // but only when no lot with the same description already exists (avoid duplicates).
+                        $resolvedPart = $this->resultHandler->resolvePart($scan);
+                        $stockInfo = $resolvedPart !== null ? $this->resultHandler->getStockInfo($scan) : null;
+
+                        if ($stockInfo !== null && $stockInfo['amount'] > 0 && $resolvedPart !== null) {
+                            $lotName = $stockInfo['lotName'] ?? '';
+                            $alreadyExists = $lotName !== '' && $resolvedPart->getPartLots()->exists(
+                                static fn($key, $lot) => $lot->getDescription() === $lotName
+                            );
+
+                            if (!$alreadyExists) {
+                                return $this->redirectToRoute('app_part_show', [
+                                    'id' => $resolvedPart->getID(),
+                                    'open_add_lot' => '1',
+                                    'lot_description' => $lotName,
+                                    'lot_amount' => $stockInfo['amount'],
+                                ]);
+                            }
+                        }
+
                         return $this->redirect($url);
                     }
 
@@ -125,6 +150,10 @@ class ScanController extends AbstractController
                     $resolvedPart = $this->resultHandler->resolvePart($scan);
                     $openUrl = $this->resultHandler->getInfoURL($scan);
 
+                    //If the part already exists and the barcode carries stock information (amount + order number),
+                    //offer the user to add this stock to the existing part.
+                    $addStockInfo = $resolvedPart !== null ? $this->resultHandler->getStockInfo($scan) : null;
+
                     //If no entity is found, try to create an URL for creating a new part (only for vendor codes)
                     $createUrl = null;
                     if ($dbEntity === null) {
@@ -139,6 +168,9 @@ class ScanController extends AbstractController
                             'part' => $resolvedPart,
                             'openUrl' => $openUrl,
                             'createUrl' => $createUrl,
+                            'addStockInfo' => $addStockInfo,
+                            'inputB64' => base64_encode($input),
+                            'scanMode' => $mode?->value,
                         ]);
                     }
 
@@ -165,7 +197,88 @@ class ScanController extends AbstractController
             'part' => $resolvedPart ?? null,
             'openUrl' => $openUrl ?? null,
             'createUrl' => $createUrl ?? null,
+            'addStockInfo' => $addStockInfo ?? null,
+            'inputB64' => isset($input) ? base64_encode($input) : null,
+            'scanMode' => isset($mode) ? $mode->value : null,
         ]);
+    }
+
+    /**
+     * Adds the stock (amount + order number) encoded in a scanned vendor barcode to the already existing part it
+     * resolves to. A new part lot tagged with the order number is created and the scanned amount is added to it.
+     */
+    #[Route(path: '/add_stock', name: 'scan_add_stock', methods: ['POST'])]
+    public function addStock(Request $request, EntityManagerInterface $em, PartLotWithdrawAddHelper $withdrawAddHelper): Response
+    {
+        $this->denyAccessUnlessGranted('@tools.label_scanner');
+
+        if (!$this->isCsrfTokenValid('scan_add_stock', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'CSRF Token invalid!');
+            return $this->redirectToRoute('scan_dialog');
+        }
+
+        //The original barcode input is transported base64 encoded, so non-printable characters (e.g. the EIGP114
+        //group separators) survive the round trip through the HTML form.
+        $input = base64_decode((string) $request->request->get('input', ''), true);
+        if ($input === false || $input === '') {
+            $this->addFlash('warning', 'scan.format_unknown');
+            return $this->redirectToRoute('scan_dialog');
+        }
+
+        $modeStr = $request->request->get('mode');
+        $mode = ($modeStr !== null && $modeStr !== '') ? BarcodeSourceType::tryFrom((string) $modeStr) : null;
+
+        try {
+            $scan = $this->barcodeNormalizer->scanBarcodeContent($input, $mode);
+        } catch (\Throwable) {
+            $this->addFlash('warning', 'scan.format_unknown');
+            return $this->redirectToRoute('scan_dialog');
+        }
+
+        $part = $this->resultHandler->resolvePart($scan);
+        if (!$part instanceof Part) {
+            $this->addFlash('warning', 'scan.qr_not_found');
+            return $this->redirectToRoute('scan_dialog');
+        }
+
+        $stockInfo = $this->resultHandler->getStockInfo($scan);
+        if ($stockInfo === null || $stockInfo['amount'] <= 0) {
+            $this->addFlash('warning', 'label_scanner.add_stock.no_amount');
+            return $this->redirect($this->resultHandler->getInfoURL($scan) ?? $this->generateUrl('homepage'));
+        }
+
+        $targetLotId = $request->request->get('target_lot_id');
+
+        if ($targetLotId !== null && $targetLotId !== 'new' && $targetLotId !== '') {
+            //Add to an existing lot chosen by the user
+            $partLot = $em->find(PartLot::class, (int) $targetLotId);
+            if (!$partLot instanceof PartLot || $partLot->getPart() !== $part) {
+                $this->addFlash('warning', 'scan.qr_not_found');
+                return $this->redirectToRoute('scan_dialog');
+            }
+        } else {
+            //Create a new part lot tagged with the order number and add the scanned amount to it
+            $partLot = new PartLot();
+            $partLot->setPart($part);
+            $partLot->setDescription($stockInfo['lotName'] ?? '');
+            if (($stockInfo['lotUserBarcode'] ?? null) !== null && $stockInfo['lotUserBarcode'] !== '') {
+                $partLot->setUserBarcode($stockInfo['lotUserBarcode']);
+            }
+            $partLot->setAmount(0);
+            $part->addPartLot($partLot);
+            $em->persist($partLot);
+            // Flush now so the new lot receives a database ID before the log entry is created
+            // $em->flush();
+        }
+
+        //Ensure that the user is allowed to add stock to this part
+        $this->denyAccessUnlessGranted('add', $partLot);
+
+        $withdrawAddHelper->add($partLot, $stockInfo['amount'], $stockInfo['lotName'] ?? null);
+        $em->flush();
+
+        $this->addFlash('success', 'label_scanner.add_stock.success');
+        return $this->redirect($this->resultHandler->getInfoURL($scan) ?? $this->generateUrl('homepage'));
     }
 
     /**

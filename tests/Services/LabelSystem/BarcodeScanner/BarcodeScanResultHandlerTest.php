@@ -178,4 +178,27 @@ final class BarcodeScanResultHandlerTest extends KernelTestCase
         $this->assertSame('lcsc', $infos['providerKey']);
         $this->assertSame('C138033', $infos['providerId']);
     }
+
+    public function testGetStockInfoLCSC(): void
+    {
+        $lcscScan = LCSCBarcodeScanResult::parse('{pbn:PB1,on:ON1,pc:C138033,pm:RC0402FR-071ML,qty:10}');
+        $stockInfo = $this->service->getStockInfo($lcscScan);
+
+        $this->assertNotNull($stockInfo);
+        $this->assertSame(10.0, $stockInfo['amount']);
+        //The order number (on) is preferred over the pick batch number (pbn) as the lot name
+        $this->assertSame('ON1', $stockInfo['lotName']);
+        $this->assertSame('{pbn:PB1,on:ON1,pc:C138033,pm:RC0402FR-071ML,qty:10}', $stockInfo['lotUserBarcode']);
+    }
+
+    public function testGetStockInfoReturnsNullWithoutAmount(): void
+    {
+        //A barcode scan result without a usable amount must not yield stock info
+        $scan = new EIGP114BarcodeScanResult([]);
+        $this->assertNull($this->service->getStockInfo($scan));
+
+        //Local barcodes never carry stock information
+        $local = new LocalBarcodeScanResult(LabelSupportedElement::PART, 1, BarcodeSourceType::INTERNAL);
+        $this->assertNull($this->service->getStockInfo($local));
+    }
 }

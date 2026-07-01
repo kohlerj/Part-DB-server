@@ -131,9 +131,21 @@ final class PartController extends AbstractController
 
         // Build the add-lot form for the INFO page modal (only when not in time-travel mode)
         $addLotForm = null;
+        $openAddLotModal = false;
         if ($timeTravel_timestamp === null && $this->isGranted('edit', $part)) {
             $newLot = new PartLot();
             $newLot->setPart($part);
+
+            // Pre-fill description and amount when redirected here from the barcode scanner
+            if ($request->query->getBoolean('open_add_lot')) {
+                $openAddLotModal = true;
+                $newLot->setDescription($request->query->getString('lot_description', ''));
+                $lotAmount = $request->query->get('lot_amount');
+                if ($lotAmount !== null && $lotAmount !== '') {
+                    $newLot->setAmount((float) $lotAmount);
+                }
+            }
+
             $addLotForm = $this->createForm(PartLotType::class, $newLot, [
                 'measurement_unit' => $part->getPartUnit(),
                 'action' => $this->generateUrl('part_lot_add', ['id' => $part->getID()]),
@@ -153,6 +165,7 @@ final class PartController extends AbstractController
                 'withdraw_add_helper' => $withdrawAddHelper,
                 'highlightLotId' => $request->query->getInt('highlightLot', 0),
                 'add_lot_form' => $addLotForm,
+                'open_add_lot_modal' => $openAddLotModal,
             ]
         );
     }

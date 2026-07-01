@@ -28,6 +28,9 @@ use App\Entity\Attachments\AttachmentType;
 use App\Entity\InfoProviderSystem\BulkInfoProviderImportJob;
 use App\Entity\InfoProviderSystem\BulkInfoProviderImportJobPart;
 use App\Entity\LabelSystem\LabelProfile;
+use App\Entity\OrderSystem\Order;
+use App\Entity\OrderSystem\OrderItem;
+use App\Entity\OrderSystem\OrderSupplierReference;
 use App\Entity\Parameters\AbstractParameter;
 use App\Entity\Parts\Category;
 use App\Entity\Parts\Footprint;
@@ -75,6 +78,9 @@ enum ElementTypes: string implements TranslatableInterface
     case BULK_INFO_PROVIDER_IMPORT_JOB = "bulk_info_provider_import_job";
     case BULK_INFO_PROVIDER_IMPORT_JOB_PART = "bulk_info_provider_import_job_part";
     case PART_CUSTOM_STATE = "part_custom_state";
+    case ORDER = "order";
+    case ORDER_ITEM = "order_item";
+    case ORDER_SUPPLIER_REFERENCE = "order_supplier_reference";
 
     //Child classes has to become before parent classes
     private const CLASS_MAPPING = [
@@ -101,6 +107,9 @@ enum ElementTypes: string implements TranslatableInterface
         BulkInfoProviderImportJob::class => self::BULK_INFO_PROVIDER_IMPORT_JOB,
         BulkInfoProviderImportJobPart::class => self::BULK_INFO_PROVIDER_IMPORT_JOB_PART,
         PartCustomState::class => self::PART_CUSTOM_STATE,
+        Order::class => self::ORDER,
+        OrderItem::class => self::ORDER_ITEM,
+        OrderSupplierReference::class => self::ORDER_SUPPLIER_REFERENCE,
     ];
 
     /**
@@ -132,6 +141,9 @@ enum ElementTypes: string implements TranslatableInterface
             self::BULK_INFO_PROVIDER_IMPORT_JOB => 'bulk_info_provider_import_job.label',
             self::BULK_INFO_PROVIDER_IMPORT_JOB_PART => 'bulk_info_provider_import_job_part.label',
             self::PART_CUSTOM_STATE => 'part_custom_state.label',
+            self::ORDER => 'order.label',
+            self::ORDER_ITEM => 'order_item.label',
+            self::ORDER_SUPPLIER_REFERENCE => 'order_supplier_reference.label',
         };
     }
 
@@ -161,6 +173,9 @@ enum ElementTypes: string implements TranslatableInterface
             self::BULK_INFO_PROVIDER_IMPORT_JOB => 'bulk_info_provider_import_job.labelp',
             self::BULK_INFO_PROVIDER_IMPORT_JOB_PART => 'bulk_info_provider_import_job_part.labelp',
             self::PART_CUSTOM_STATE => 'part_custom_state.labelp',
+            self::ORDER => 'order.labelp',
+            self::ORDER_ITEM => 'order_item.labelp',
+            self::ORDER_SUPPLIER_REFERENCE => 'order_supplier_reference.labelp',
         };
     }
 
