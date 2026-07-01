@@ -13791,7 +13791,8 @@ Buerklin-API Authentication server:
       <segment state="translated">
         <source>part.edit.provider_reference.warning</source>
         <target>Warning: Changing values here can break the  info retrieval mechanism! You should use the "update from  info provider" functionality whenever possible.</target>
-
+      </segment>
+    </unit>
     <unit id="ord.001" name="order.label">
       <segment state="translated">
         <source>order.label</source>
