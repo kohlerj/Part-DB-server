@@ -133,6 +133,7 @@ class LogFilterType extends AbstractType
                 LogTargetType::PART_CUSTOM_STATE => 'part_custom_state.label',
                 LogTargetType::ORDER => 'order.label',
                 LogTargetType::ORDER_ITEM => 'order_item.label',
+                LogTargetType::ORDER_SUPPLIER_REFERENCE => 'order_supplier_reference.label',
             },
         ]);
 
